@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/db.changelog-products.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/db.changelog-orders.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/db.changelog-order-items.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/db.changelog-products-data.sql
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/db.changelog-orders-data.sql
+      relativeToChangelogFile: false

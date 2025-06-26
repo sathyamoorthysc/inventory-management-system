@@ -2,6 +2,10 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'checkstyle'
+    id 'jacoco'
+    id 'com.diffplug.spotless' version "7.0.4"
+    id "org.owasp.dependencycheck" version "12.1.0"
 }
 
 group = 'com.cams.inventorymanagement'
@@ -19,6 +23,12 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.liquibase:liquibase-core:4.32.0'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    runtimeOnly 'com.h2database:h2:2.3.232'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -26,3 +36,59 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// Checkstyle plugin configuration
+checkstyle {
+    toolVersion = "10.25.0"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    maxWarnings = 0
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.required = false
+        html.required = true
+    }
+}
+
+// Spotless plugin configuration
+spotless {
+    java {
+        googleJavaFormat "1.27.0"
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+    reportsDirectory.set(layout.buildDirectory.dir("jacoco"))
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        html.required = true
+    }
+}
+test.finalizedBy jacocoTestReport
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90
+            }
+        }
+    }
+}
+check.dependsOn jacocoTestCoverageVerification
+
+// dependency check plugin configuration
+//dependencyCheck {
+//    dependencyCheck {
+//        //Build will fail when vulnerabilities have a CVSS scoring above medium
+//        failBuildOnCVSS = 7
+//
+//        suppressionFile = '.dependency-check-suppression.xml'
+//    }
+//}
+//check.dependsOn dependencyCheckAnalyze
